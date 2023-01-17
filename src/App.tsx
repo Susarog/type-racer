@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import wordsDB from '../db.json';
+import Timer from './components/Timer';
 
 function App() {
   const [numbers, setNumbers] = useState<boolean>(false);
   const [listOfWords, setListOfWords] = useState<Array<string>>([]);
   const [currentWord, setCurrentWord] = useState<string>('');
   const [currentWordIndex, setCurrentWordIndex] = useState<number>(0);
+  const [charCounter, setCharCounter] = useState<number>(0);
   const insertWord = (event: React.ChangeEvent<HTMLInputElement>) => {
     const currentInputWord = event.target.value;
     if (currentWord === currentInputWord) {
       //prolly will need to update the error too if it is fixed.
       setCurrentWordIndex(currentWordIndex + 1);
+      setCharCounter(charCounter + currentInputWord.length);
       setCurrentWord(`${listOfWords[currentWordIndex + 1]} `);
       event.target.value = '';
     } else if (
@@ -26,7 +29,6 @@ function App() {
     setListOfWords(temp);
     setCurrentWord(`${temp[0]} `);
   };
-
   useEffect(() => {
     resetTypeRacer();
   }, []);
@@ -50,6 +52,7 @@ function App() {
       <button onClick={resetTypeRacer}>reset</button>
       <button> next test </button>
       <button>repeat</button>
+      <Timer />
     </div>
   );
 }
