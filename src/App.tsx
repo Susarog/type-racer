@@ -1,27 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import wordsDB from '../db.json';
 import Timer from './components/Timer';
+import { PreviousWord, PreviousWordArray } from '../types';
 
 function App() {
+  const [input, setInput] = useState<string>('');
   const [numbers, setNumbers] = useState<boolean>(false);
   const [listOfWords, setListOfWords] = useState<Array<string>>([]);
   const [currentWord, setCurrentWord] = useState<string>('');
   const [currentWordIndex, setCurrentWordIndex] = useState<number>(0);
   const [charCounter, setCharCounter] = useState<number>(0);
-  const insertWord = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const currentInputWord = event.target.value;
-    if (currentWord === currentInputWord) {
-      //prolly will need to update the error too if it is fixed.
+  const [prevWord, setPrevWord] = useState<PreviousWordArray>([
+    {
+      word: '',
+      isCorrect: true,
+    },
+  ]);
+  const testFunc = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value[event.target.value.length - 1] === ' ') {
+      return;
+    }
+    setInput(event.target.value);
+  };
+  const insertWord = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === ' ' && input.length !== 0) {
+      const currentInputWord = input + event.key;
       setCurrentWordIndex(currentWordIndex + 1);
-      setCharCounter(charCounter + currentInputWord.length);
       setCurrentWord(`${listOfWords[currentWordIndex + 1]} `);
-      event.target.value = '';
+      setCharCounter(charCounter + currentInputWord.length);
+      setPrevWord(
+        prevWord.concat({
+          word: currentInputWord,
+          isCorrect: currentInputWord === currentWord,
+        })
+      );
+      setInput('');
+      return;
     } else if (
-      currentWord.substring(0, currentInputWord.length) === currentInputWord
+      event.key === 'Backspace' &&
+      input.length === 0 &&
+      !prevWord[prevWord.length - 1].isCorrect
     ) {
-      //prolly will need to update the error too if it is fixed.
-    } else {
-      //prolly put form error stuff here
+      setInput(prevWord[prevWord.length - 1].word);
+      setPrevWord(prevWord.slice(0, prevWord.length - 1));
+      setCurrentWord(`${listOfWords[currentWordIndex - 1]} `);
+      setCurrentWordIndex(currentWordIndex - 1);
     }
   };
   const resetTypeRacer = () => {
@@ -47,7 +70,12 @@ function App() {
           <span key={word}>{word} </span>
         ))}
       </div>
-      <input onChange={insertWord} />
+      <input
+        type="text"
+        value={input}
+        onChange={testFunc}
+        onKeyDown={insertWord}
+      />
       <button onClick={() => setNumbers(!numbers)}>numbers</button>
       <button onClick={resetTypeRacer}>reset</button>
       <button> next test </button>
