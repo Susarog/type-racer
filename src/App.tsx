@@ -15,8 +15,9 @@ function App() {
     setListOfWords(newArr);
   };
   useEffect(() => {
-    const arr = wordsDB['3000-common-words'].sort(() => Math.random() - 0.5);
-    setListOfWords(arr);
+    setListOfWords(
+      wordsDB['3000-common-words'].sort(() => Math.random() - 0.5)
+    );
     setTimeInSec(30);
   }, []);
 
