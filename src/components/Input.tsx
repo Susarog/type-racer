@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PreviousWordArray } from '../../types';
 
-const Input = ({ listOfWords }: { listOfWords: Array<string> }) => {
-  const [currentWord, setCurrentWord] = useState<string>('');
+const Input = ({
+  listOfWords,
+  setIsTypingValid,
+}: {
+  listOfWords: Array<string>;
+  setIsTypingValid: any;
+}) => {
+  const [currentWord, setCurrentWord] = useState<string>(`${listOfWords[0]} `);
   const [currentWordIndex, setCurrentWordIndex] = useState<number>(0);
   const [prevWord, setPrevWord] = useState<PreviousWordArray>([
     {
@@ -11,7 +17,20 @@ const Input = ({ listOfWords }: { listOfWords: Array<string> }) => {
     },
   ]);
   const [input, setInput] = useState<string>('');
+  useEffect(() => {
+    setCurrentWord(`${listOfWords[0]} `);
+    setCurrentWordIndex(0);
+    setPrevWord([
+      {
+        word: '',
+        isCorrect: true,
+      },
+    ]);
+    setInput('');
+    setIsTypingValid(false);
+  }, [listOfWords]);
   const testFunc = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsTypingValid(true);
     if (event.target.value[event.target.value.length - 1] === ' ') {
       event.preventDefault();
       return;
@@ -23,6 +42,7 @@ const Input = ({ listOfWords }: { listOfWords: Array<string> }) => {
       const currentInputWord = input + event.key;
       setCurrentWordIndex(currentWordIndex + 1);
       setCurrentWord(`${listOfWords[currentWordIndex + 1]} `);
+      console.log(currentInputWord, currentWord);
       setPrevWord(
         prevWord.concat({
           word: currentInputWord,
