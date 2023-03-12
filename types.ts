@@ -3,3 +3,9 @@ export interface PreviousWord {
   isCorrect: boolean;
 }
 export type PreviousWordArray = Array<PreviousWord>;
+
+export interface AllCharacterType {
+  correct: number;
+  incorrect: number;
+  missed: number;
+}

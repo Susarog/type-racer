@@ -4,9 +4,11 @@ import { PreviousWordArray } from '../../types';
 const Input = ({
   listOfWords,
   setIsTypingValid,
+  setCharacters,
 }: {
   listOfWords: Array<string>;
   setIsTypingValid: any;
+  setCharacters: any;
 }) => {
   const [currentWord, setCurrentWord] = useState<string>(`${listOfWords[0]} `);
   const [currentWordIndex, setCurrentWordIndex] = useState<number>(0);
@@ -42,7 +44,6 @@ const Input = ({
       const currentInputWord = input + event.key;
       setCurrentWordIndex(currentWordIndex + 1);
       setCurrentWord(`${listOfWords[currentWordIndex + 1]} `);
-      console.log(currentInputWord, currentWord);
       setPrevWord(
         prevWord.concat({
           word: currentInputWord,
