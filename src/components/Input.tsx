@@ -5,10 +5,12 @@ const Input = ({
   listOfWords,
   setIsTypingValid,
   setCharacters,
+  characters,
 }: {
   listOfWords: Array<string>;
   setIsTypingValid: any;
   setCharacters: any;
+  characters: any;
 }) => {
   const [currentWord, setCurrentWord] = useState<string>(`${listOfWords[0]} `);
   const [currentWordIndex, setCurrentWordIndex] = useState<number>(0);
@@ -30,26 +32,56 @@ const Input = ({
     ]);
     setInput('');
     setIsTypingValid(false);
+    setCharacters({
+      correct: 0,
+      incorrect: 0,
+      missed: 0,
+    });
   }, [listOfWords]);
-  const testFunc = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsTypingValid(true);
-    if (event.target.value[event.target.value.length - 1] === ' ') {
+  const updateTextBox = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value.at(event.target.value.length - 1) === ' ') {
       event.preventDefault();
       return;
     }
+    setIsTypingValid(true);
     setInput(event.target.value);
   };
   const insertWord = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === ' ' && input.length !== 0) {
       const currentInputWord = input + event.key;
+      const isCorrect = currentInputWord === currentWord;
       setCurrentWordIndex(currentWordIndex + 1);
       setCurrentWord(`${listOfWords[currentWordIndex + 1]} `);
       setPrevWord(
         prevWord.concat({
           word: currentInputWord,
-          isCorrect: currentInputWord === currentWord,
+          isCorrect: isCorrect,
         })
       );
+      if (isCorrect) {
+        setCharacters({
+          ...characters,
+          correct: characters.correct + input.length,
+        });
+      } else if (!isCorrect && currentInputWord.length != currentWord.length) {
+        setCharacters({
+          ...characters,
+          missed:
+            characters.missed +
+            Math.abs(currentWord.length - currentInputWord.length),
+        });
+      } else {
+        let counter = 0;
+        for (let i = 0; i < currentInputWord.length - 1; i++) {
+          if (currentWord.at(i) !== currentInputWord.at(i)) {
+            counter++;
+          }
+        }
+        setCharacters({
+          ...characters,
+          incorrect: characters.incorrect + counter,
+        });
+      }
       setInput('');
       return;
     } else if (
@@ -57,17 +89,37 @@ const Input = ({
       input.length === 0 &&
       !prevWord[prevWord.length - 1].isCorrect
     ) {
-      setInput(prevWord[prevWord.length - 1].word);
+      const inputWord = prevWord[prevWord.length - 1].word;
+      const currWord = `${listOfWords[currentWordIndex - 1]} `;
+      setInput(inputWord);
       setPrevWord(prevWord.slice(0, prevWord.length - 1));
-      setCurrentWord(`${listOfWords[currentWordIndex - 1]} `);
+      setCurrentWord(currWord);
       setCurrentWordIndex(currentWordIndex - 1);
+      if (currWord.length != inputWord.length) {
+        setCharacters({
+          ...characters,
+          missed:
+            characters.missed - Math.abs(currWord.length - inputWord.length),
+        });
+      } else {
+        let counter = 0;
+        for (let i = 0; i < inputWord.length - 1; i++) {
+          if (currWord.at(i) !== inputWord.at(i)) {
+            counter++;
+          }
+        }
+        setCharacters({
+          ...characters,
+          incorrect: characters.incorrect - counter,
+        });
+      }
     }
   };
   return (
     <input
       type="text"
       value={input}
-      onChange={testFunc}
+      onChange={updateTextBox}
       onKeyDown={insertWord}
     />
   );

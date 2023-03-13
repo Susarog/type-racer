@@ -7,12 +7,14 @@ const Typing = ({
   setIsDone,
   listOfWords,
   resetTypeRacer,
+  characters,
 }: {
   time: number;
   setCharacters: any;
   setIsDone: any;
   listOfWords: Array<string>;
   resetTypeRacer: any;
+  characters: any;
 }) => {
   const [numbers, setNumbers] = useState<boolean>(false);
   const [isTypingValid, setIsTypingValid] = useState<boolean>(false);
@@ -43,6 +45,7 @@ const Typing = ({
           listOfWords={listOfWords}
           setIsTypingValid={setIsTypingValid}
           setCharacters={setCharacters}
+          characters={characters}
         />
         <button onClick={() => setNumbers(!numbers)}>numbers</button>
         <button onClick={resetTypeRacer}>reset</button>

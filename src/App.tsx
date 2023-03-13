@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Typing from './components/Typing';
+import Result from './components/Result';
 import { AllCharacterType } from '../types';
 import wordsDB from '../db.json';
 
@@ -37,8 +38,11 @@ function App() {
         setIsDone={setIsDone}
         listOfWords={listOfWords}
         resetTypeRacer={resetTypeRacer}
+        characters={characters}
       />
     );
+  } else {
+    return <Result setIsDone={setIsDone} resetTypeRacer={resetTypeRacer} />;
   }
 }
 

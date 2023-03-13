@@ -11,7 +11,7 @@ const Timer = ({ time, setIsDone }: { time: number; setIsDone: any }) => {
       setDuration(secondLeft);
       if (secondLeft === 0) {
         setIsStart(false);
-        setIsDone(false);
+        setIsDone(true);
         clearInterval(interval);
       }
     }, 1000);
