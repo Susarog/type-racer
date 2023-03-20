@@ -1,12 +1,21 @@
 import React from 'react';
 
+import { AllCharacterType } from '../../types';
 const Result = ({
-  setIsDone,
+  characters,
+  time,
   resetTypeRacer,
 }: {
-  setIsDone: any;
+  characters: AllCharacterType;
+  time: number;
   resetTypeRacer: any;
 }) => {
+  const minFromSec = time / 60;
+  const calculateWPM = () => {
+    console.log(characters);
+    return Math.round(characters.correct / 5 / minFromSec);
+  };
+
   return (
     <div
       style={{
@@ -17,9 +26,15 @@ const Result = ({
       }}
     >
       <div>
-        <button onClick={resetTypeRacer}>reset</button>
-        <button onClick={resetTypeRacer}> next test</button>
-        <button>repeat</button>
+        <div>{calculateWPM()}WPM</div>
+        <div>
+          characters:{characters.correct}/{characters.incorrect}/
+          {characters.missed}
+        </div>
+      </div>
+      <div>
+        <button onClick={resetTypeRacer}>Next test</button>
+        <button onClick={resetTypeRacer}>Repeat</button>
       </div>
     </div>
   );

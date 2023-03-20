@@ -121,6 +121,7 @@ const Input = ({
       value={input}
       onChange={updateTextBox}
       onKeyDown={insertWord}
+      ref={(input) => input && input.focus()}
     />
   );
 };

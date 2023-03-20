@@ -16,7 +16,6 @@ const Typing = ({
   resetTypeRacer: any;
   characters: any;
 }) => {
-  const [numbers, setNumbers] = useState<boolean>(false);
   const [isTypingValid, setIsTypingValid] = useState<boolean>(false);
 
   return (
@@ -47,10 +46,7 @@ const Typing = ({
           setCharacters={setCharacters}
           characters={characters}
         />
-        <button onClick={() => setNumbers(!numbers)}>numbers</button>
-        <button onClick={resetTypeRacer}>reset</button>
-        <button onClick={resetTypeRacer}> next test</button>
-        <button>repeat</button>
+        <button onClick={resetTypeRacer}>Reset</button>
         {isTypingValid ? <Timer time={time} setIsDone={setIsDone} /> : null}
       </div>
     </div>
