@@ -1,16 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import Typing from './components/Typing';
 import Result from './components/Result';
-import Header from './components/Header';
-import Footer from './components/Footer';
 
-import { AllCharacterType } from '../types';
+import { WordInputArray, AllCharacterType } from './types';
 import wordsDB from '../db.json';
+
+const Header = () => {
+  return (
+    <div
+      style={{
+        backgroundColor: 'blue',
+      }}
+    >
+      Type Racer
+    </div>
+  );
+};
+
+const Footer = () => {
+  return (
+    <div
+      style={{
+        backgroundColor: 'blue',
+      }}
+    >
+      Footer
+    </div>
+  );
+};
 
 function App() {
   const [isDone, setIsDone] = useState<boolean>(false);
   const [time, setTime] = useState<number>(30);
-  const [listOfWords, setListOfWords] = useState<Array<string>>([]);
+  const [listOfWords, setListOfWords] = useState<WordInputArray>([]);
   const [characters, setCharacters] = useState<AllCharacterType>({
     correct: 0,
     incorrect: 0,
@@ -18,54 +40,40 @@ function App() {
   });
 
   const resetTypeRacer = () => {
+    const wordInputArray: WordInputArray = wordsDB['commonWords'].map(
+      (str) => ({
+        word: str,
+        status: 'inactive',
+      })
+    );
+    wordInputArray.sort(() => Math.random() - 0.5);
+    wordInputArray[0] = { ...wordInputArray[0], status: 'active' };
+    setListOfWords(wordInputArray);
     setIsDone(false);
     setCharacters({
       correct: 0,
       incorrect: 0,
       missed: 0,
     });
-    const newArr = [...listOfWords];
-    newArr.sort(() => Math.random() - 0.5);
-    setListOfWords(newArr);
   };
+
   useEffect(() => {
-    setListOfWords(wordsDB['commonWords'].sort(() => Math.random() - 0.5));
-    setTime(30);
-    setIsDone(false);
-    setCharacters({
-      correct: 0,
-      incorrect: 0,
-      missed: 0,
-    });
+    resetTypeRacer();
   }, []);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        minHeight: '100vh',
-      }}
-    >
-      <div
-        style={{
-          display: 'grid',
-          gridAutoFlow: 'row',
-          gridTemplateRows: 'auto 1fr auto',
-          maxWidth: '1200px',
-          minHeight: '100vh',
-        }}
-      >
+    <div className='container'>
+      <div className='racing-page'>
         <Header />
         {!isDone ? (
           <Typing
             time={time}
+            characters={characters}
             setCharacters={setCharacters}
             setIsDone={setIsDone}
             listOfWords={listOfWords}
+            setListOfWords={setListOfWords}
             resetTypeRacer={resetTypeRacer}
-            characters={characters}
           />
         ) : (
           <Result

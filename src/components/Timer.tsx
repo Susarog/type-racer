@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-const Timer = ({ time, setIsDone }: { time: number; setIsDone: any }) => {
+const Timer = ({
+  time,
+  setIsDone,
+}: {
+  time: number;
+  setIsDone: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const [isStart, setIsStart] = useState(true);
   const [duration, setDuration] = useState(time);
 

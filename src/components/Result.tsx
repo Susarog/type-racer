@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AllCharacterType } from '../../types';
+import { AllCharacterType } from '../types';
 const Result = ({
   characters,
   time,
@@ -8,7 +8,7 @@ const Result = ({
 }: {
   characters: AllCharacterType;
   time: number;
-  resetTypeRacer: any;
+  resetTypeRacer: React.MouseEventHandler<HTMLButtonElement>;
 }) => {
   const minFromSec = time / 60;
   const calculateWPM = () => {
@@ -17,14 +17,7 @@ const Result = ({
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
+    <div className='result-container'>
       <div>
         <div>{calculateWPM()}WPM</div>
         <div>

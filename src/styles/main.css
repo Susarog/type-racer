@@ -8,3 +8,56 @@
 body {
   min-height: 100vh;
 }
+
+.word {
+  margin: 0.25em;
+}
+.active {
+  background-color: grey;
+  border: 2px solid grey;
+  border-radius: 5px;
+}
+.correct {
+  color: green;
+}
+.incorrect {
+  color: red;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.racing-page {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: auto 1fr auto;
+  max-width: 1200px;
+  min-height: 100vh;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.word-container {
+  font-size: 1.5rem;
+  width: 100%;
+  height: 156px;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: unset;
+  padding-bottom: 1em;
+}
+.result-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
