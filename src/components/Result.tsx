@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-import { AllCharacterType } from '../types';
+import { AllCharacterType } from "../types";
 const Result = ({
   characters,
   time,
@@ -12,12 +12,11 @@ const Result = ({
 }) => {
   const minFromSec = time / 60;
   const calculateWPM = () => {
-    console.log(characters);
     return Math.round(characters.correct / 5 / minFromSec);
   };
 
   return (
-    <div className='result-container'>
+    <div className="result-container">
       <div>
         <div>{calculateWPM()}WPM</div>
         <div>

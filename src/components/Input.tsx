@@ -1,53 +1,12 @@
-import { useEffect, useState, useRef } from "react";
-import { WordInputArray, AllCharacterType } from "../types";
+import { forwardRef, useState, useEffect } from "react";
 
-const AllWords = ({ listOfWords }: { listOfWords: WordInputArray }) => {
-  return (
-    <>
-      {listOfWords.map((word, i) => {
-        return (
-          <div
-            key={i}
-            className={
-              word.status !== "inactive" ? `${word.status} word` : "word"
-            }
-          >
-            {word.word}
-          </div>
-        );
-      })}
-    </>
-  );
-};
-
-interface TypingProps {
-  characters: AllCharacterType;
-  setCharacters: React.Dispatch<React.SetStateAction<AllCharacterType>>;
-  listOfWords: WordInputArray;
-  setListOfWords: React.Dispatch<React.SetStateAction<WordInputArray>>;
-  resetTypeRacer: React.MouseEventHandler<HTMLButtonElement>;
-  children: JSX.Element;
-  toggleIsTimerRunning: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const Typing = ({
-  characters,
-  setCharacters,
-  listOfWords,
-  setListOfWords,
-  resetTypeRacer,
-  children,
-  toggleIsTimerRunning,
-}: TypingProps) => {
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+const Input = forwardRef((props, ref) => {
   const [input, setInput] = useState("");
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [rowIndex, setRowIndex] = useState(1);
-  const [top, setTop] = useState(0);
-  const ref = useRef<HTMLCollection | null>(null);
-
   useEffect(() => {
     setCurrentWordIndex(0);
-    setInput("");
+
     setCharacters({
       correct: 0,
       incorrect: 0,
@@ -162,36 +121,13 @@ const Typing = ({
       setInput(`${listOfWords[prevIndex].inputtedWord} `);
     }
   };
-  const findChildNode = (elem: HTMLDivElement | null) => {
-    if (!elem || !elem.children) return;
-    if (elem.children.length !== 0) {
-      ref.current = elem.children;
-    }
-  };
-
   return (
-    <div className="content">
-      <div className="word-container">
-        <div
-          className="row"
-          style={{ top: top }}
-          ref={(containterRef) => containterRef && findChildNode(containterRef)}
-        >
-          <AllWords listOfWords={listOfWords} />
-        </div>
-      </div>
-      <div>
-        <input
-          value={input}
-          onChange={updateTextBox}
-          onKeyDown={insertWord}
-          ref={(input) => input && input.focus()}
-        />
-        <button onClick={resetTypeRacer}>Reset</button>
-        {children}
-      </div>
-    </div>
+    <input
+      value={input}
+      onChange={updateTextBox}
+      onKeyDown={insertWord}
+      ref={(input) => input && input.focus()}
+    />
   );
-};
-
-export default Typing;
+});
+export default Input;

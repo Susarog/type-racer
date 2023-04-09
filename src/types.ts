@@ -4,8 +4,9 @@ export interface AllCharacterType {
   missed: number;
 }
 
-interface WordInput {
+export interface WordInput {
   word: string;
-  status: 'active' | 'inactive' | 'incorrect' | 'correct';
+  inputtedWord: string;
+  status: "active" | "inactive" | "incorrect" | "correct";
 }
 export type WordInputArray = Array<WordInput>;
