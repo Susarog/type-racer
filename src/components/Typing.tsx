@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, memo } from "react";
 import { WordInputArray, AllCharacterType } from "../types";
 
-const AllWords = ({ listOfWords }: { listOfWords: WordInputArray }) => {
+/* eslint-disable react/display-name */
+const AllWords = memo(({ listOfWords }: { listOfWords: WordInputArray }) => {
   return (
     <>
       {listOfWords.map((word, i) => {
@@ -15,7 +16,7 @@ const AllWords = ({ listOfWords }: { listOfWords: WordInputArray }) => {
       })}
     </>
   );
-};
+});
 
 interface TypingProps {
   characters: AllCharacterType;
@@ -61,23 +62,40 @@ const Typing = ({
     });
   }, [listOfWords]);
 
-  const updateTextBox = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value.at(-1) === " ") {
-      return;
-    }
+  const inputBoxHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    listOfWords[currentArrWordIndex].split("").forEach((letter, idx) => {
+      if (idx > event.target.value.length - 1) {
+        ref.current![currentArrWordIndex].children[idx].classList.remove(
+          "correct",
+          "incorrect"
+        );
+      } else if (letter === event.target.value.at(idx)) {
+        ref.current![currentArrWordIndex].children[idx].classList.add(
+          "correct"
+        );
+      } else {
+        ref.current![currentArrWordIndex].children[idx].classList.add(
+          "incorrect"
+        );
+      }
+    });
     toggleIsTimerRunning(true);
     setInput(event.target.value);
   };
-  const insertWord = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const switchWordHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === " " && input.length === 0) {
+      event.preventDefault();
       return;
     }
+    //moving to the next word
     if (event.key === " " && input.length !== 0) {
+      event.preventDefault();
       const currentTop =
         ref.current![currentArrWordIndex].getBoundingClientRect().top;
       const nextTop =
         ref.current![currentArrWordIndex + 1].getBoundingClientRect().top;
       const isCorrect = input === listOfWords[currentArrWordIndex];
+      //TODO FIX THIS SHIT. use a flexbox and delete nodes?????
       if (currentTop !== nextTop) {
         setTop(-(nextTop - currentTop) * rowIndex);
         setRowIndex(rowIndex + 1);
@@ -93,6 +111,7 @@ const Typing = ({
           isCorrect: isCorrect,
         })
       );
+      //TODO change this and put it for each second in the timer!!!
       setCharacters({
         correct: isCorrect
           ? characters.correct + input.length
@@ -107,8 +126,11 @@ const Typing = ({
       });
       setInput("");
       setCurrentWordIndex(0);
-    } else if (event.key === "Backspace" && input.length === 0) {
-      if (prevWord.length === 0 || prevWord[prevWord.length - 1].isCorrect) {
+      return;
+    }
+    if (event.key === "Backspace" && input.length === 0) {
+      event.preventDefault();
+      if (prevWord[prevWord.length - 1].isCorrect) {
         return;
       }
       const inputtedWord = prevWord[prevWord.length - 1].word;
@@ -117,6 +139,7 @@ const Typing = ({
       setCurrentWordIndex(prevWord[prevWord.length - 1].prevIndex);
       setCurrentArrWordIndex(prevIndex);
       setPrevWord(prevWord.slice(0, prevWord.length - 1));
+      setInput(inputtedWord);
       setCharacters({
         ...characters,
         missed:
@@ -124,30 +147,6 @@ const Typing = ({
           Math.abs(listOfWords[prevIndex].length - inputtedWord.length),
         incorrect: characters.incorrect - inputtedWord.length,
       });
-      setInput(`${inputtedWord} `);
-    } else if (event.key === "Backspace") {
-      setCurrentWordIndex((idx) => idx - 1);
-      console.log(currentWordIndex);
-      if (currentWordIndex > listOfWords[currentArrWordIndex].length) {
-        return;
-      }
-      ref.current![currentArrWordIndex].children[
-        currentWordIndex - 1
-      ].classList.remove("correct", "incorrect");
-    } else {
-      setCurrentWordIndex((idx) => idx + 1);
-      if (currentWordIndex > listOfWords[currentArrWordIndex].length - 1) {
-        return;
-      }
-      if (listOfWords[currentArrWordIndex].at(currentWordIndex) === event.key) {
-        ref.current![currentArrWordIndex].children[
-          currentWordIndex
-        ].classList.add("correct");
-      } else {
-        ref.current![currentArrWordIndex].children[
-          currentWordIndex
-        ].classList.add("incorrect");
-      }
     }
   };
 
@@ -172,8 +171,8 @@ const Typing = ({
       <div>
         <input
           value={input}
-          onChange={updateTextBox}
-          onKeyDown={insertWord}
+          onChange={inputBoxHandler}
+          onKeyDown={switchWordHandler}
           ref={(input) => input && input.focus()}
         />
         <button onClick={resetTypeRacer}>Reset</button>

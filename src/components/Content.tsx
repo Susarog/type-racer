@@ -5,7 +5,6 @@ import Timer from "./Timer";
 
 import { WordInputArray, AllCharacterType } from "../types";
 import wordsDB from "../../db.json";
-import GameContent from "./GameContent";
 
 const Content = () => {
   const [isDone, setIsDone] = useState<boolean>(false);
