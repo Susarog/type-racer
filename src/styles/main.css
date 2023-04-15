@@ -12,6 +12,7 @@ body {
 .word {
   margin: 0.25em;
   display: inline-block;
+  border-bottom: 1px solid white;
 }
 .active {
   background-color: #dddddd;
@@ -20,7 +21,10 @@ body {
   color: green;
 }
 .incorrect {
-  background-color: red;
+  color: red;
+}
+.error {
+  border-bottom: 1px solid red;
 }
 
 .container {

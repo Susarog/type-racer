@@ -5,6 +5,7 @@ import Timer from "./Timer";
 
 import { WordInputArray, AllCharacterType } from "../types";
 import wordsDB from "../../db.json";
+import GameContent from "./GameContent";
 
 const Content = () => {
   const [isDone, setIsDone] = useState<boolean>(false);
@@ -18,16 +19,10 @@ const Content = () => {
   });
 
   const resetTypeRacer = () => {
-    const wordInputArray: WordInputArray = wordsDB["commonWords"].map(
-      (str) => ({
-        word: str,
-        inputtedWord: "",
-        status: "inactive",
-      })
+    const randomizedWordList = wordsDB["commonWords"].sort(
+      () => Math.random() - 0.5
     );
-    wordInputArray.sort(() => Math.random() - 0.5);
-    wordInputArray[0] = { ...wordInputArray[0], status: "active" };
-    setWordList(wordInputArray);
+    setWordList(randomizedWordList);
     setIsDone(false);
     setCharacters({
       correct: 0,
@@ -49,7 +44,6 @@ const Content = () => {
           characters={characters}
           setCharacters={setCharacters}
           listOfWords={wordList}
-          setListOfWords={setWordList}
           resetTypeRacer={resetTypeRacer}
           toggleIsTimerRunning={toggleIsTimerRunning}
         >

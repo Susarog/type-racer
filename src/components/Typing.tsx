@@ -6,13 +6,10 @@ const AllWords = ({ listOfWords }: { listOfWords: WordInputArray }) => {
     <>
       {listOfWords.map((word, i) => {
         return (
-          <div
-            key={i}
-            className={
-              word.status !== "inactive" ? `${word.status} word` : "word"
-            }
-          >
-            {word.word}
+          <div key={word + i} className="word">
+            {word.split("").map((char, i) => {
+              return <span key={char + i}>{char}</span>;
+            })}
           </div>
         );
       })}
@@ -24,92 +21,78 @@ interface TypingProps {
   characters: AllCharacterType;
   setCharacters: React.Dispatch<React.SetStateAction<AllCharacterType>>;
   listOfWords: WordInputArray;
-  setListOfWords: React.Dispatch<React.SetStateAction<WordInputArray>>;
   resetTypeRacer: React.MouseEventHandler<HTMLButtonElement>;
   children: JSX.Element;
   toggleIsTimerRunning: React.Dispatch<React.SetStateAction<boolean>>;
 }
+interface PreviousWord {
+  word: string;
+  prevIndex: number;
+  isCorrect: boolean;
+}
+type PreviousWordArray = Array<PreviousWord>;
 
 const Typing = ({
   characters,
   setCharacters,
   listOfWords,
-  setListOfWords,
   resetTypeRacer,
   children,
   toggleIsTimerRunning,
 }: TypingProps) => {
+  const [currentArrWordIndex, setCurrentArrWordIndex] = useState(0);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [input, setInput] = useState("");
   const [rowIndex, setRowIndex] = useState(1);
   const [top, setTop] = useState(0);
+  const [prevWord, setPrevWord] = useState<PreviousWordArray>([]);
   const ref = useRef<HTMLCollection | null>(null);
-
   useEffect(() => {
+    setCurrentArrWordIndex(0);
     setCurrentWordIndex(0);
     setInput("");
+    setRowIndex(1);
+    setPrevWord([]);
+    setTop(0);
     setCharacters({
       correct: 0,
       incorrect: 0,
       missed: 0,
     });
-    setRowIndex(1);
-  }, []);
+  }, [listOfWords]);
+
   const updateTextBox = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value.at(-1) === " ") {
       return;
     }
-    const isCorrect =
-      event.target.value ===
-      listOfWords[currentWordIndex].word.substring(
-        0,
-        event.target.value.length
-      );
-    setListOfWords(
-      listOfWords.map((word, i) => {
-        if (currentWordIndex === i) {
-          return {
-            ...word,
-            status: isCorrect ? "active" : "incorrect",
-          };
-        }
-        return word;
-      })
-    );
     toggleIsTimerRunning(true);
     setInput(event.target.value);
   };
   const insertWord = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === " " && input.length === 0) {
+      return;
+    }
     if (event.key === " " && input.length !== 0) {
       const currentTop =
-        ref.current![currentWordIndex].getBoundingClientRect().top;
+        ref.current![currentArrWordIndex].getBoundingClientRect().top;
       const nextTop =
-        ref.current![currentWordIndex + 1].getBoundingClientRect().top;
+        ref.current![currentArrWordIndex + 1].getBoundingClientRect().top;
+      const isCorrect = input === listOfWords[currentArrWordIndex];
       if (currentTop !== nextTop) {
         setTop(-(nextTop - currentTop) * rowIndex);
         setRowIndex(rowIndex + 1);
       }
-      setCurrentWordIndex(currentWordIndex + 1);
-      const isCorrect = input === listOfWords[currentWordIndex].word;
-      setListOfWords(
-        listOfWords.map((word, i) => {
-          if (currentWordIndex === i) {
-            return {
-              ...word,
-              inputtedWord: input,
-              status: isCorrect ? "correct" : "incorrect",
-            };
-          }
-          if (currentWordIndex + 1 === i) {
-            return {
-              ...word,
-              status: "active",
-            };
-          }
-          return word;
+      if (!isCorrect) {
+        ref.current![currentArrWordIndex].classList.add("error");
+      }
+      setCurrentArrWordIndex(currentArrWordIndex + 1);
+      setPrevWord(
+        prevWord.concat({
+          word: input,
+          prevIndex: currentWordIndex,
+          isCorrect: isCorrect,
         })
       );
-
       setCharacters({
         correct: isCorrect
           ? characters.correct + input.length
@@ -117,51 +100,57 @@ const Typing = ({
         missed: isCorrect
           ? characters.missed
           : characters.missed +
-            Math.abs(listOfWords[currentWordIndex].word.length - input.length),
+            Math.abs(listOfWords[currentArrWordIndex].length - input.length),
         incorrect: isCorrect
           ? characters.incorrect
           : characters.incorrect + input.length,
       });
       setInput("");
-    } else if (
-      event.key === "Backspace" &&
-      input.length === 0 &&
-      currentWordIndex !== 0 &&
-      listOfWords[currentWordIndex - 1].status === "incorrect"
-    ) {
-      const prevIndex = currentWordIndex - 1;
-      setCurrentWordIndex(prevIndex);
-      setListOfWords(
-        listOfWords.map((word, i) => {
-          if (prevIndex === i) {
-            return {
-              ...word,
-              status: "active",
-            };
-          }
-          if (currentWordIndex === i) {
-            return {
-              ...word,
-              status: "inactive",
-            };
-          }
-          return word;
-        })
-      );
+      setCurrentWordIndex(0);
+    } else if (event.key === "Backspace" && input.length === 0) {
+      if (prevWord.length === 0 || prevWord[prevWord.length - 1].isCorrect) {
+        return;
+      }
+      const inputtedWord = prevWord[prevWord.length - 1].word;
+      const prevIndex = currentArrWordIndex - 1;
+      ref.current![prevIndex].classList.remove("error");
+      setCurrentWordIndex(prevWord[prevWord.length - 1].prevIndex);
+      setCurrentArrWordIndex(prevIndex);
+      setPrevWord(prevWord.slice(0, prevWord.length - 1));
       setCharacters({
         ...characters,
         missed:
           characters.missed -
-          Math.abs(
-            listOfWords[prevIndex].word.length -
-              listOfWords[prevIndex].inputtedWord.length
-          ),
-        incorrect:
-          characters.incorrect - listOfWords[prevIndex].inputtedWord.length,
+          Math.abs(listOfWords[prevIndex].length - inputtedWord.length),
+        incorrect: characters.incorrect - inputtedWord.length,
       });
-      setInput(`${listOfWords[prevIndex].inputtedWord} `);
+      setInput(`${inputtedWord} `);
+    } else if (event.key === "Backspace") {
+      setCurrentWordIndex((idx) => idx - 1);
+      console.log(currentWordIndex);
+      if (currentWordIndex > listOfWords[currentArrWordIndex].length) {
+        return;
+      }
+      ref.current![currentArrWordIndex].children[
+        currentWordIndex - 1
+      ].classList.remove("correct", "incorrect");
+    } else {
+      setCurrentWordIndex((idx) => idx + 1);
+      if (currentWordIndex > listOfWords[currentArrWordIndex].length - 1) {
+        return;
+      }
+      if (listOfWords[currentArrWordIndex].at(currentWordIndex) === event.key) {
+        ref.current![currentArrWordIndex].children[
+          currentWordIndex
+        ].classList.add("correct");
+      } else {
+        ref.current![currentArrWordIndex].children[
+          currentWordIndex
+        ].classList.add("incorrect");
+      }
     }
   };
+
   const findChildNode = (elem: HTMLDivElement | null) => {
     if (!elem || !elem.children) return;
     if (elem.children.length !== 0) {
