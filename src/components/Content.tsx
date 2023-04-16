@@ -18,9 +18,9 @@ const Content = () => {
   });
 
   const resetTypeRacer = () => {
-    const randomizedWordList = wordsDB["commonWords"].sort(
-      () => Math.random() - 0.5
-    );
+    const randomizedWordList = wordsDB["commonWords"]
+      .sort(() => Math.random() - 0.5)
+      .concat([]);
     setWordList(randomizedWordList);
     setIsDone(false);
     setCharacters({
@@ -42,7 +42,7 @@ const Content = () => {
         <Typing
           characters={characters}
           setCharacters={setCharacters}
-          listOfWords={wordList}
+          wordList={wordList}
           resetTypeRacer={resetTypeRacer}
           toggleIsTimerRunning={toggleIsTimerRunning}
         >
