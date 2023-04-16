@@ -2,10 +2,11 @@ import { useEffect, useState, useRef, memo } from "react";
 import { WordInputArray, AllCharacterType } from "../types";
 
 /* eslint-disable react/display-name */
-const AllWords = memo(({ listOfWords }: { listOfWords: WordInputArray }) => {
+const AllWords = memo(({ wordList }: { wordList: WordInputArray }) => {
+  console.log("Greeting was rendered at", new Date().toLocaleTimeString());
   return (
     <>
-      {listOfWords.map((word, i) => {
+      {wordList.map((word, i) => {
         return (
           <div key={word + i} className="word">
             {word.split("").map((char, i) => {
@@ -21,7 +22,7 @@ const AllWords = memo(({ listOfWords }: { listOfWords: WordInputArray }) => {
 interface TypingProps {
   characters: AllCharacterType;
   setCharacters: React.Dispatch<React.SetStateAction<AllCharacterType>>;
-  listOfWords: WordInputArray;
+  wordList: WordInputArray;
   resetTypeRacer: React.MouseEventHandler<HTMLButtonElement>;
   children: JSX.Element;
   toggleIsTimerRunning: React.Dispatch<React.SetStateAction<boolean>>;
@@ -36,7 +37,7 @@ type PreviousWordArray = Array<PreviousWord>;
 const Typing = ({
   characters,
   setCharacters,
-  listOfWords,
+  wordList,
   resetTypeRacer,
   children,
   toggleIsTimerRunning,
@@ -60,10 +61,10 @@ const Typing = ({
       incorrect: 0,
       missed: 0,
     });
-  }, [listOfWords]);
+  }, [wordList]);
 
   const inputBoxHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    listOfWords[currentArrWordIndex].split("").forEach((letter, idx) => {
+    wordList[currentArrWordIndex].split("").forEach((letter, idx) => {
       if (idx > event.target.value.length - 1) {
         ref.current![currentArrWordIndex].children[idx].classList.remove(
           "correct",
@@ -94,7 +95,7 @@ const Typing = ({
         ref.current![currentArrWordIndex].getBoundingClientRect().top;
       const nextTop =
         ref.current![currentArrWordIndex + 1].getBoundingClientRect().top;
-      const isCorrect = input === listOfWords[currentArrWordIndex];
+      const isCorrect = input === wordList[currentArrWordIndex];
       //TODO FIX THIS SHIT. use a flexbox and delete nodes?????
       if (currentTop !== nextTop) {
         setTop(-(nextTop - currentTop) * rowIndex);
@@ -119,7 +120,7 @@ const Typing = ({
         missed: isCorrect
           ? characters.missed
           : characters.missed +
-            Math.abs(listOfWords[currentArrWordIndex].length - input.length),
+            Math.abs(wordList[currentArrWordIndex].length - input.length),
         incorrect: isCorrect
           ? characters.incorrect
           : characters.incorrect + input.length,
@@ -144,7 +145,7 @@ const Typing = ({
         ...characters,
         missed:
           characters.missed -
-          Math.abs(listOfWords[prevIndex].length - inputtedWord.length),
+          Math.abs(wordList[prevIndex].length - inputtedWord.length),
         incorrect: characters.incorrect - inputtedWord.length,
       });
     }
@@ -165,7 +166,7 @@ const Typing = ({
           style={{ top: top }}
           ref={(containterRef) => containterRef && findChildNode(containterRef)}
         >
-          <AllWords listOfWords={listOfWords} />
+          <AllWords wordList={wordList} />
         </div>
       </div>
       <div>
