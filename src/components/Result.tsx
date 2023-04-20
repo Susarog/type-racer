@@ -1,27 +1,21 @@
 import React from "react";
 
-import { AllCharacterType } from "../types";
+import { TypingStats } from "../types";
 const Result = ({
-  characters,
-  time,
+  typingStats,
   resetTypeRacer,
 }: {
-  characters: AllCharacterType;
-  time: number;
+  typingStats: TypingStats;
   resetTypeRacer: React.MouseEventHandler<HTMLButtonElement>;
 }) => {
-  const minFromSec = time / 60;
-  const calculateWPM = () => {
-    return Math.round(characters.correct / 5 / minFromSec);
-  };
-
+  const result = typingStats[typingStats.length - 1];
+  const stat = result.stat;
   return (
     <div className="result-container">
       <div>
-        <div>{calculateWPM()}WPM</div>
+        <div>{result.wpm}WPM</div>
         <div>
-          characters:{characters.correct}/{characters.incorrect}/
-          {characters.missed}
+          characters:{stat.correct}/{stat.incorrect}/{stat.missed}
         </div>
       </div>
       <div>

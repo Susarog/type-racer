@@ -1,36 +1,34 @@
 import { useState, useEffect } from "react";
 import Typing from "./Typing";
 import Result from "./Result";
-import Timer from "./Timer";
-
-import { WordInputArray, AllCharacterType } from "../types";
+import { WordInputArray, TypingStats } from "../types";
 import wordsDB from "../../db.json";
 
 const Content = () => {
   const [isDone, setIsDone] = useState<boolean>(false);
-  const [time, setTime] = useState<number>(30);
+  const [timeLimit, setTimeLimit] = useState<number>(30);
   const [wordList, setWordList] = useState<WordInputArray>([]);
   const [isTimerRunning, toggleIsTimerRunning] = useState(false);
-  const [characters, setCharacters] = useState<AllCharacterType>({
-    correct: 0,
-    incorrect: 0,
-    missed: 0,
-  });
-
+  const [typingStats, setTypingStats] = useState<TypingStats>([]);
   const resetTypeRacer = () => {
     const randomizedWordList = wordsDB["commonWords"]
       .sort(() => Math.random() - 0.5)
       .concat([]);
     setWordList(randomizedWordList);
     setIsDone(false);
-    setCharacters({
+    const stat = {
       correct: 0,
-      incorrect: 0,
       missed: 0,
-    });
-
+      incorrect: 0,
+    };
+    setTypingStats([
+      {
+        stat: stat,
+        wpm: 0,
+        acc: 0,
+      },
+    ]);
     toggleIsTimerRunning(false);
-    setTime(30);
   };
 
   useEffect(() => {
@@ -40,20 +38,17 @@ const Content = () => {
     <>
       {!isDone ? (
         <Typing
-          characters={characters}
-          setCharacters={setCharacters}
+          typingStats={typingStats}
+          setTypingStats={setTypingStats}
           wordList={wordList}
           resetTypeRacer={resetTypeRacer}
+          isTimerRunning={isTimerRunning}
           toggleIsTimerRunning={toggleIsTimerRunning}
-        >
-          <>{isTimerRunning && <Timer time={time} setIsDone={setIsDone} />}</>
-        </Typing>
-      ) : (
-        <Result
-          characters={characters}
-          time={time}
-          resetTypeRacer={resetTypeRacer}
+          timeLimit={timeLimit}
+          setIsDone={setIsDone}
         />
+      ) : (
+        <Result typingStats={typingStats} resetTypeRacer={resetTypeRacer} />
       )}
     </>
   );
