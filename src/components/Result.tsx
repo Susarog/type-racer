@@ -11,16 +11,18 @@ const Result = ({
   const result = typingStats[typingStats.length - 1];
   const stat = result.stat;
   return (
-    <div className="result-container">
-      <div>
-        <div>{result.wpm}WPM</div>
+    <div className="content">
+      <div className="result-container">
         <div>
-          characters:{stat.correct}/{stat.incorrect}/{stat.missed}
+          <div>{Math.round(result.wpm * 10) / 10}WPM</div>
+          <div>
+            characters:{stat.correct}/{stat.incorrect}/{stat.missed}
+          </div>
         </div>
-      </div>
-      <div>
-        <button onClick={resetTypeRacer}>Next test</button>
-        <button onClick={resetTypeRacer}>Repeat</button>
+        <div>
+          <button onClick={resetTypeRacer}>Next test</button>
+          <button onClick={resetTypeRacer}>Repeat</button>
+        </div>
       </div>
     </div>
   );
